@@ -14,6 +14,7 @@
     access_token <- httr::content(httr::POST(url = access_url, body = list(
       grant_type = "client_credentials", client_id = clientid, client_secret = clientsecret,
       scope = "https://graph.microsoft.com/.default")))$access_token
+    if(nchar(access_token)) message("Token successfully generated!")
     Sys.setenv(SHAREPOINT_TOKEN = sprintf("Bearer %s", access_token))
   }, error = function(e){
     warning("Could not generate access token. Please follow instructions in README file.")
