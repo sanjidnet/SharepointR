@@ -1,7 +1,7 @@
 #' Copy Sharepoint Item
 #'
-#' @param read_team_name acceptable values: `products`, `utils`
-#' @param write_team_name acceptable values: `products`, `utils`
+#' @param read_team_name name of team or drive
+#' @param write_team_name name of team or drive
 #' @param read_folder replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
 #' @param write_folder replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
 #' @param read_file include extension
@@ -22,8 +22,8 @@ copySharepointItem <- function(read_team_name, read_folder, read_file, write_tea
 
 #' Move Sharepoint Item
 #'
-#' @param read_team_name acceptable values: `products`, `utils`
-#' @param write_team_name acceptable values: `products`, `utils`
+#' @param read_team_name name of team or drive
+#' @param write_team_name name of team or drive
 #' @param read_folder replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
 #' @param write_folder replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
 #' @param read_file include extension
@@ -43,14 +43,14 @@ moveSharepointItem <- function(read_team_name, read_folder, read_file, write_tea
     return(response)
   } else { # move between drives has to be done by copying - then deleting original
     copy_status <- copySharepointItem(read_team_name, read_folder, read_file, write_team_name, write_folder, write_file)
-    if(copy_status$status_code == 202) delete_sharepoint_item(team_name = read_team_name, folder_name = read_folder, file_name = read_file)
+    if(copy_status$status_code == 202) deleteSharepointItem(team_name = read_team_name, folder_name = read_folder, file_name = read_file)
     return(copy_status)
   }
 }
 
 #' Delete Sharepoint Item
 #'
-#' @param team_name acceptable values: `products`, `utils`
+#' @param team_name name of team or drive
 #' @param folder_name replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
 #' @param file_name include extension
 #'
@@ -76,7 +76,7 @@ processTransferParameters <- function(read_team_name, read_folder, read_file, wr
   write_file_id <- getItemId(team_name = write_team_name, folder_path = write_folder, filename = write_file)
   if(!is.null(write_file_id)){
     warning("Destination already exists and will be overwritted")
-    delete_sharepoint_item(team_name = write_team_name, folder_name = write_folder, file_name = write_file)
+    deleteSharepointItem(team_name = write_team_name, folder_name = write_folder, file_name = write_file)
 
   }
 

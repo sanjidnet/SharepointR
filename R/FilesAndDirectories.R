@@ -1,6 +1,6 @@
 #' Title
 #'
-#' @param team_name acceptable values: `products`, `utils`
+#' @param team_name name of team or drive
 #'
 #' @return
 #' @export
@@ -14,7 +14,7 @@ getDriveId <- function(team_name){
 
 #' Title
 #'
-#' @param team_name acceptable values: `products`, `utils`
+#' @param team_name name of team or drive
 #' @param folder_path replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
 #' @param filename include extension
 #'
