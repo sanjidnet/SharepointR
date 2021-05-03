@@ -40,7 +40,7 @@ Passwords, access tokens, API keys are not stored here. So, installation will re
 
 
 ``` r
-devtools::install_github("sanjid25/SharepointR")
+devtools::install_github("officepd/SharepointR")
 ```
 
 REFERENCE

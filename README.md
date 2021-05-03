@@ -32,7 +32,7 @@ will require the following steps:
     instructions in Sharepoint Token Resource below:
 
 ``` r
-devtools::install_github("sanjid25/SharepointR")
+devtools::install_github("sanjidnet/SharepointR")
 ```
 
 REFERENCE
