@@ -7,7 +7,7 @@
 deleteSharepointItem(team_name, folder_name, file_name)
 }
 \arguments{
-\item{team_name}{acceptable values: `products`, `utils`}
+\item{team_name}{name of team or drive}
 
 \item{folder_name}{replace back slashes with forward slashes `/`. Feel free to keep spaces if present.}
 

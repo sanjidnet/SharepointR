@@ -14,13 +14,13 @@ copySharepointItem(
 )
 }
 \arguments{
-\item{read_team_name}{acceptable values: `products`, `utils`}
+\item{read_team_name}{name of team or drive}
 
 \item{read_folder}{replace back slashes with forward slashes `/`. Feel free to keep spaces if present.}
 
 \item{read_file}{include extension}
 
-\item{write_team_name}{acceptable values: `products`, `utils`}
+\item{write_team_name}{name of team or drive}
 
 \item{write_folder}{replace back slashes with forward slashes `/`. Feel free to keep spaces if present.}
 

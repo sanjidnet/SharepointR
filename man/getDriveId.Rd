@@ -7,7 +7,7 @@
 getDriveId(team_name)
 }
 \arguments{
-\item{team_name}{acceptable values: `products`, `utils`}
+\item{team_name}{name of team or drive}
 }
 \value{
 
