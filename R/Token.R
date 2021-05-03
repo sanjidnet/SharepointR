@@ -12,6 +12,8 @@
     scope = "https://graph.microsoft.com/.default")))$access_token
   Sys.setenv(SHAREPOINT_TOKEN = sprintf("Bearer %s", access_token))
 
+  if(!length(access_token)) warning("Could not generate access token. Please follow instructions in README file.")
+
   # message("Sharepoint token set to system environment variable as `SHAREPOINT_TOKEN` ")
   # return(sprintf("Bearer %s", access_token))
 }
