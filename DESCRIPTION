@@ -7,7 +7,9 @@ Maintainer: Sanjid Rahman <sanjid25@gmail.com>
 Description: The goal of SharepointR is to make use of Microsoft Graph API to access and modify Microsoft Sharepoint items
 Imports: httr,
   curl,
-  openssl
+  openssl,
+  jsonlite,
+  data.table
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
