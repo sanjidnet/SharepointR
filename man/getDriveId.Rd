@@ -2,7 +2,7 @@
 % Please edit documentation in R/FilesAndDirectories.R
 \name{getDriveId}
 \alias{getDriveId}
-\title{Title}
+\title{Sharepoint Drive Id}
 \usage{
 getDriveId(team_name)
 }
@@ -13,5 +13,5 @@ getDriveId(team_name)
 
 }
 \description{
-Title
+Sharepoint Drive Id
 }

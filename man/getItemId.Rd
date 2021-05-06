@@ -2,20 +2,20 @@
 % Please edit documentation in R/FilesAndDirectories.R
 \name{getItemId}
 \alias{getItemId}
-\title{Title}
+\title{Sharepoint Item Id}
 \usage{
-getItemId(team_name, folder_path, filename)
+getItemId(team_name, folder_path, filename = "")
 }
 \arguments{
 \item{team_name}{name of team or drive}
 
 \item{folder_path}{replace back slashes with forward slashes `/`. Feel free to keep spaces if present.}
 
-\item{filename}{include extension}
+\item{filename}{include extension, leave alone if you're looking for item id of a folder only}
 }
 \value{
 item identification to be used for reading / writing / copying / moving / deleting
 }
 \description{
-Title
+Sharepoint Item Id
 }
