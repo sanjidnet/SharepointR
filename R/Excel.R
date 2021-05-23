@@ -32,7 +32,7 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   }
   write_drive_id <- getDriveId(team_name = write_team_name)
   # Web URL may be useful for a download URL
-  write_folder_url <- content(GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s", write_drive_id, write_folder), add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$webUrl
+  write_folder_url <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s", write_drive_id, write_folder), httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$webUrl
   write_folder_id <- getItemId(team_name = write_team_name, folder_path = folder_path)
   write_file_id <- getItemId(team_name = write_team_name, folder_path = write_folder, filename = write_file)
   delete_message <- deleteSharepointItem(team_name = write_team_name, folder_name = write_folder, file_name = write_file)
@@ -42,16 +42,16 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   Sys.sleep(30);
 
   write_file_id <- getItemId(team_name = team_name, folder_path = write_folder, filename = write_file)
-  sheetid <- content(GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/", write_drive_id, write_file_id), add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$value[[1]]$id
+  sheetid <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/", write_drive_id, write_file_id), httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$value[[1]]$id
   Sys.sleep(10);
 
   column_letter <- int_to_excel_column(dim(dta)[2])
-  write_table_id <- content(POST(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/tables/add", write_drive_id, write_file_id, sheetid),
-                                 add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json"),
+  write_table_id <- httr::content(httr::POST(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/tables/add", write_drive_id, write_file_id, sheetid),
+                                 httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json"),
                                  body = sprintf("{address: 'A1:%s%s', 'hasHeaders': true}", column_letter, (dim(dta)[1] + 1))))$id
   Sys.sleep(10);
-  session_id <- content(POST(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/createSession", write_drive_id, write_file_id),
-                             add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN")), body = "{'persistChanges': true}"))$id
+  session_id <- httr::content(httr::POST(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/createSession", write_drive_id, write_file_id),
+                             httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN")), body = "{'persistChanges': true}"))$id
   data.table::setDT(dta)
   message("Start writing: ", Sys.time())
   for(column_id in 1:dim(dta)[2]){
@@ -69,39 +69,39 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
 }
 
 write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, column_id, column_name, preserve_character = FALSE){
-  temp <- toJSON(list(values = as.list(c(column_name, t(dta)))), pretty = TRUE, na = "null")
+  temp <- jsonlite::toJSON(list(values = as.list(c(column_name, t(dta)))), pretty = TRUE, na = "null")
   iterator <- ceiling(as.numeric(object.size(temp)) / 512 / 1024 / 4) # conservative iterator; always >= 1
   entry_limit <- floor(dim(dta)[1] / iterator)
 
   if(preserve_character == TRUE){
     if(sapply(dta, class)[[1]] == "character"){
-      formatting_request <- PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s2:%s%s')",
+      formatting_request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s2:%s%s')",
                                           drive_id, write_file_id, sheetid, int_to_excel_column(column_id), int_to_excel_column(column_id), (dim(dta)[1] + 1)),
-                                  add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
+                                  httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
                                   # numberFormat for Excel Text is "@". Yeah, I find it's funny too.
-                                  body = toJSON(list(numberFormat = as.list(rep("@", dim(dta)[1]))), pretty = TRUE, na = "null"))
+                                  body = jsonlite::toJSON(list(numberFormat = as.list(rep("@", dim(dta)[1]))), pretty = TRUE, na = "null"))
     }
     if(sapply(dta, class)[[1]] == "percentage"){
-      formatting_request <- PATCH(sprintf(
+      formatting_request <- httr::PATCH(sprintf(
         "https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s2:%s%s')",
         drive_id, write_file_id, sheetid, int_to_excel_column(column_id), int_to_excel_column(column_id), (dim(dta)[1] + 1)),
-        add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
-        body = toJSON(list(numberFormat = as.list(rep("0.0%", dim(dta)[1]))), pretty = TRUE, na = "null"))
+        httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
+        body = jsonlite::toJSON(list(numberFormat = as.list(rep("0.0%", dim(dta)[1]))), pretty = TRUE, na = "null"))
     }
     if(sapply(dta, class)[[1]] == "currency"){
-      formatting_request <- PATCH(sprintf(
+      formatting_request <- httr::PATCH(sprintf(
         "https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s2:%s%s')",
         drive_id, write_file_id, sheetid, int_to_excel_column(column_id), int_to_excel_column(column_id), (dim(dta)[1] + 1)),
-        add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
-        body = toJSON(list(numberFormat = as.list(rep("$#,##0.00", dim(dta)[1]))), pretty = TRUE, na = "null"))
+        httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
+        body = jsonlite::toJSON(list(numberFormat = as.list(rep("$#,##0.00", dim(dta)[1]))), pretty = TRUE, na = "null"))
     }
   }
 
   message("FIRST PATCH")
-  request <- PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s1:%s%s')",
+  request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s1:%s%s')",
                            drive_id, write_file_id, sheetid, int_to_excel_column(column_id), int_to_excel_column(column_id), (entry_limit + 1)),
-                   add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
-                   body = toJSON(list(values = as.list(c(column_name, t(dta[1:entry_limit])))), pretty = TRUE, na = "null"))
+                   httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
+                   body = jsonlite::toJSON(list(values = as.list(c(column_name, t(dta[1:entry_limit])))), pretty = TRUE, na = "null"))
 
   message("REMAINING PATCHES")
   if(iterator == 1) return(request)
@@ -115,10 +115,10 @@ write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, colu
 
     message("t: ", t, " -start_at: ", start_at, " -end_at: ", end_at)
 
-    request <- PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s%s:%s%s')",
+    request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s%s:%s%s')",
                              drive_id, write_file_id, sheetid, int_to_excel_column(column_id), (start_at + 1), int_to_excel_column(column_id), (end_at + 1)),
-                     add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
-                     body = toJSON(list(values = as.list(c(t(writer)))), pretty = TRUE, na = "null"))
+                     httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
+                     body = jsonlite::toJSON(list(values = as.list(c(t(writer)))), pretty = TRUE, na = "null"))
     t <- t + 1
   }
 
@@ -126,9 +126,9 @@ write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, colu
   message("t: ", t, " -remainder: ", remainder, " -rows: ", dim(dta)[1])
   if(remainder == 0) return(request)
   # FIX REMAINDER SCRIPT
-  request <- PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s%s:%s%s')",
+  request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s%s:%s%s')",
                            drive_id, write_file_id, sheetid, int_to_excel_column(column_id), (dim(dta)[1] - remainder + 2), int_to_excel_column(column_id), (dim(dta)[1] + 1)),
-                   add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
-                   body = toJSON(list(values = as.list(c(t(tail(dta, remainder))))), pretty = TRUE, na = "null"))
+                   httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
+                   body = jsonlite::toJSON(list(values = as.list(c(t(tail(dta, remainder))))), pretty = TRUE, na = "null"))
   return(request)
 }
