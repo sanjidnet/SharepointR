@@ -32,7 +32,7 @@ write_excel_to_sharepoint(
 
 \item{preserve_character}{if false, this will recognize `currency`, `percentage`, `character` class.
 These classes will be converted to the respective excel format thusly. The rest will be `General`
-If true, everything is `General`. Defaul is false and recommended}
+If true, everything is `General`.}
 }
 \value{
 
