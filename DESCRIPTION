@@ -4,7 +4,8 @@ Title: Tools to work with Sharepoints
 Version: 0.1.0
 Author: Sanjid Rahman
 Maintainer: Sanjid Rahman <sanjid25@gmail.com>
-Description: The goal of SharepointR is to make use of Microsoft Graph API to access and modify Microsoft Sharepoint items
+Description: The goal of SharepointR is to make use of Microsoft Graph API to access 
+  and modify Microsoft Sharepoint items.
 Imports: httr,
   curl,
   openssl,
