@@ -33,7 +33,7 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   write_drive_id <- getDriveId(team_name = write_team_name)
   # Web URL may be useful for a download URL
   write_folder_url <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s", write_drive_id, write_folder), httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$webUrl
-  write_folder_id <- getItemId(team_name = write_team_name, folder_path = folder_path)
+  write_folder_id <- getItemId(team_name = write_team_name, folder_path = write_folder)
   write_file_id <- getItemId(team_name = write_team_name, folder_path = write_folder, filename = write_file)
   delete_message <- deleteSharepointItem(team_name = write_team_name, folder_name = write_folder, file_name = write_file)
   Sys.sleep(10);
@@ -41,7 +41,7 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   copySharepointItem(read_team_name = read_team_name, read_folder = read_folder, read_file = read_file, write_team_name = write_team_name, write_folder = write_folder, write_file = write_file)
   Sys.sleep(30);
 
-  write_file_id <- getItemId(team_name = team_name, folder_path = write_folder, filename = write_file)
+  write_file_id <- getItemId(team_name = write_team_name, folder_path = write_folder, filename = write_file)
   sheetid <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/", write_drive_id, write_file_id), httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$value[[1]]$id
   Sys.sleep(10);
 
