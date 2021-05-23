@@ -1,7 +1,7 @@
 int_to_excel_column <- function(input){
   excel_column <- ""
   while(input > 0){
-    remainder <- (input - 1) %% 26; message("Remainder: ", remainder, " - ", LETTERS[remainder + 1])
+    remainder <- (input - 1) %% 26;
     excel_column <- paste0(LETTERS[remainder + 1], excel_column)
     input <- floor((input - remainder) / 26)
   }
@@ -19,7 +19,7 @@ int_to_excel_column <- function(input){
 #' @param dta `data.frame` or `data.table`
 #' @param preserve_character if false, this will recognize `currency`, `percentage`, `character` class.
 #' These classes will be converted to the respective excel format thusly. The rest will be `General`
-#' If true, everything is `General`. Defaul is false and recommended
+#' If true, everything is `General`.
 #' @return
 #' @export
 #'
@@ -32,7 +32,9 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   }
   write_drive_id <- getDriveId(team_name = write_team_name)
   # Web URL may be useful for a download URL
-  write_folder_url <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s", write_drive_id, write_folder), httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$webUrl
+  write_folder_url <- httr::content(httr::GET(sprintf(
+    "https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s", write_drive_id,  write_folder = gsub("\\s", "%20", write_folder)),
+    httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$webUrl
   write_folder_id <- getItemId(team_name = write_team_name, folder_path = write_folder)
   write_file_id <- getItemId(team_name = write_team_name, folder_path = write_folder, filename = write_file)
   delete_message <- deleteSharepointItem(team_name = write_team_name, folder_name = write_folder, file_name = write_file)
