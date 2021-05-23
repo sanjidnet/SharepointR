@@ -25,7 +25,9 @@ getItemId <- function(team_name, folder_path, filename = ""){
 
   item_id <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s%s", driveid, folder_path, filename),
     httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$id
-  if(is.null(item_id)) warning(sprintf("Issue with file %s, located at %s under team %s!", filename, folder_path, team_name))
+  if(is.null(item_id)){
+    warning(sprintf("Issue with file %s, located at %s under team %s!", filename, folder_path, team_name))
+  }
 
   return(item_id)
 }
