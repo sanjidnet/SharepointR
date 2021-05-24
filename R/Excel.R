@@ -59,10 +59,10 @@ writeExcelToSharepoint <- function(read_team_name, read_folder, read_file, write
   for(column_id in 1:dim(dta)[2]){
     column_name <- names(dta)[column_id]
     column_data <- dta[, column_id, with = FALSE]
-    patch_response <- write_column(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_class)
+    patch_response <- writeColumn(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_class)
     if(patch_response$status_code != 200){
       message("Second Try"); Sys.sleep(10)
-      patch_response <- write_column(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_class)
+      patch_response <- writeColumn(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_class)
     }
     # message(column_name, ": DONE WRITING AT: ", Sys.time())
   }
