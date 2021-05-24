@@ -61,7 +61,11 @@ moveSharepointItem <- function(read_team_name, read_folder, read_file, write_tea
 deleteSharepointItem <- function(team_name, folder_name, file_name){
   drive_id <- getDriveId(team_name); item_id <- getItemId(team_name, folder_path = folder_name, filename = file_name)
   # delete only if source exists
-  if(!is.null(item_id)) httr::DELETE(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s", drive_id, item_id), httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN")))
+  if(!is.null(item_id)){
+    httr::DELETE(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s", drive_id, item_id), httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN")))
+  }else{
+    message("There's nothing to delete")
+  }
 
 }
 
