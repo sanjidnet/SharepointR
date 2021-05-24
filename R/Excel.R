@@ -17,14 +17,14 @@ int_to_excel_column <- function(input){
 #' @param write_folder replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
 #' @param write_file include extension
 #' @param dta `data.frame` or `data.table`
-#' @param preserve_character if false, this will recognize `currency`, `percentage`, `character` class.
+#' @param preserve_class if true, this will recognize `currency`, `percentage`, `character` class.
 #' These classes will be converted to the respective excel format thusly. The rest will be `General`
-#' If true, everything is `General`.
+#' If false, everything is `General`.
 #' @return
 #' @export
 #'
 #' @examples
-write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, write_team_name, write_folder, write_file, dta, preserve_character = FALSE){
+write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, write_team_name, write_folder, write_file, dta, preserve_class = TRUE){
   # No point proceeding if there is no data to write
   if(!dim(dta)[1]){
     warning("THERE IS NOTHING TO WRITE")
@@ -35,9 +35,9 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   write_folder_url <- httr::content(httr::GET(sprintf(
     "https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s", write_drive_id,  write_folder = gsub("\\s", "%20", write_folder)),
     httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$webUrl
-  write_folder_id <- getItemId(team_name = write_team_name, folder_path = write_folder)
+  # write_folder_id <- getItemId(team_name = write_team_name, folder_path = write_folder)
   write_file_id <- getItemId(team_name = write_team_name, folder_path = write_folder, filename = write_file)
-  delete_message <- deleteSharepointItem(team_name = write_team_name, folder_name = write_folder, file_name = write_file)
+  # delete_message <- deleteSharepointItem(team_name = write_team_name, folder_name = write_folder, file_name = write_file)
   Sys.sleep(10);
 
   copySharepointItem(read_team_name = read_team_name, read_folder = read_folder, read_file = read_file, write_team_name = write_team_name, write_folder = write_folder, write_file = write_file)
@@ -59,10 +59,10 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   for(column_id in 1:dim(dta)[2]){
     column_name <- names(dta)[column_id]
     column_data <- dta[, column_id, with = FALSE]
-    patch_response <- write_column(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_character)
+    patch_response <- write_column(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_class)
     if(patch_response$status_code != 200){
       message("Second Try"); Sys.sleep(10)
-      patch_response <- write_column(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_character)
+      patch_response <- write_column(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_class)
     }
     message(column_name, ": DONE WRITING AT: ", Sys.time())
   }
@@ -70,12 +70,12 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   return(write_folder_url)
 }
 
-write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, column_id, column_name, preserve_character = FALSE){
+write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, column_id, column_name, preserve_class){
   temp <- jsonlite::toJSON(list(values = as.list(c(column_name, t(dta)))), pretty = TRUE, na = "null")
   iterator <- ceiling(as.numeric(object.size(temp)) / 512 / 1024 / 4) # conservative iterator; always >= 1
   entry_limit <- floor(dim(dta)[1] / iterator)
 
-  if(preserve_character == TRUE){
+  if(preserve_class == TRUE){
     if(sapply(dta, class)[[1]] == "character"){
       formatting_request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s2:%s%s')",
                                           drive_id, write_file_id, sheetid, int_to_excel_column(column_id), int_to_excel_column(column_id), (dim(dta)[1] + 1)),
