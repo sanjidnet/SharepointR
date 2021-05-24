@@ -24,7 +24,7 @@ int_to_excel_column <- function(input){
 #' @export
 #'
 #' @examples
-write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, write_team_name, write_folder, write_file, dta, preserve_class = TRUE){
+writeExcelToSharepoint <- function(read_team_name, read_folder, read_file, write_team_name, write_folder, write_file, dta, preserve_class = TRUE){
   # No point proceeding if there is no data to write
   if(!dim(dta)[1]){
     warning("THERE IS NOTHING TO WRITE")
@@ -70,7 +70,7 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
   return(write_folder_url)
 }
 
-write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, column_id, column_name, preserve_class){
+writeColumn <- function(drive_id, write_file_id, sheetid, session_id, dta, column_id, column_name, preserve_class){
   temp <- jsonlite::toJSON(list(values = as.list(c(column_name, t(dta)))), pretty = TRUE, na = "null")
   iterator <- ceiling(as.numeric(object.size(temp)) / 512 / 1024 / 4) # conservative iterator; always >= 1
   entry_limit <- floor(dim(dta)[1] / iterator)
