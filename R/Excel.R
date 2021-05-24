@@ -64,7 +64,7 @@ write_excel_to_sharepoint <- function(read_team_name, read_folder, read_file, wr
       message("Second Try"); Sys.sleep(10)
       patch_response <- write_column(drive_id = write_drive_id, write_file_id, sheetid, session_id, dta = column_data, column_id = column_id, column_name = column_name, preserve_class)
     }
-    message(column_name, ": DONE WRITING AT: ", Sys.time())
+    # message(column_name, ": DONE WRITING AT: ", Sys.time())
   }
   message("Finish writing: ", Sys.time())
   return(write_folder_url)
@@ -99,13 +99,13 @@ write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, colu
     }
   }
 
-  message("FIRST PATCH")
+  # FIRST PATCH
   request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s1:%s%s')",
                            drive_id, write_file_id, sheetid, int_to_excel_column(column_id), int_to_excel_column(column_id), (entry_limit + 1)),
                    httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
                    body = jsonlite::toJSON(list(values = as.list(c(column_name, t(dta[1:entry_limit])))), pretty = TRUE, na = "null"))
 
-  message("REMAINING PATCHES")
+  # REMAINING PATCHES
   if(iterator == 1) return(request)
 
   remainder <- dim(dta)[1] %% iterator
@@ -115,7 +115,7 @@ write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, colu
     end_at <- (t*entry_limit + entry_limit)
     writer <- dta[start_at : end_at, ]
 
-    message("t: ", t, " -start_at: ", start_at, " -end_at: ", end_at)
+    #message("t: ", t, " -start_at: ", start_at, " -end_at: ", end_at)
 
     request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s%s:%s%s')",
                              drive_id, write_file_id, sheetid, int_to_excel_column(column_id), (start_at + 1), int_to_excel_column(column_id), (end_at + 1)),
@@ -124,8 +124,7 @@ write_column <- function(drive_id, write_file_id, sheetid, session_id, dta, colu
     t <- t + 1
   }
 
-  message("LOOP ENDS")
-  message("t: ", t, " -remainder: ", remainder, " -rows: ", dim(dta)[1])
+  # LOOP ENDS message("t: ", t, " -remainder: ", remainder, " -rows: ", dim(dta)[1])
   if(remainder == 0) return(request)
   # FIX REMAINDER SCRIPT
   request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s%s:%s%s')",
