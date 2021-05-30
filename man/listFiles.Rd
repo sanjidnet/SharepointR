@@ -9,7 +9,7 @@ listFiles(team_name, folder_path)
 \arguments{
 \item{team_name}{name of team or drive}
 
-\item{folder_path}{replace back slashes with forward slashes `/`. Feel free to keep spaces if present.}
+\item{folder_path}{replace back slashes with forward slashes `/`}
 }
 \value{
 `data.table` containing `File` (name of the file / subfolder) and `LastModified` date

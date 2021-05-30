@@ -2,6 +2,7 @@
 
 export(copySharepointItem)
 export(deleteSharepointItem)
+export(downloadFileFromSharepoint)
 export(getDriveId)
 export(getItemId)
 export(listFiles)

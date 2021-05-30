@@ -133,3 +133,5 @@ writeColumn <- function(drive_id, write_file_id, sheetid, session_id, dta, colum
                    body = jsonlite::toJSON(list(values = as.list(c(t(tail(dta, remainder))))), pretty = TRUE, na = "null"))
   return(request)
 }
+
+

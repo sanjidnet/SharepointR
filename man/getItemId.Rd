@@ -9,7 +9,7 @@ getItemId(team_name, folder_path, filename = "")
 \arguments{
 \item{team_name}{name of team or drive}
 
-\item{folder_path}{replace back slashes with forward slashes `/`. Feel free to keep spaces if present.}
+\item{folder_path}{replace back slashes with forward slashes `/`}
 
 \item{filename}{include extension, leave alone if you're looking for item id of a folder only}
 }

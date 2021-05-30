@@ -13,7 +13,7 @@ getDriveId <- function(team_name){
 #' Sharepoint Item Id
 #'
 #' @param team_name name of team or drive
-#' @param folder_path replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
+#' @param folder_path replace back slashes with forward slashes `/`
 #' @param filename include extension, leave alone if you're looking for item id of a folder only
 #'
 #' @return item identification to be used for reading / writing / copying / moving / deleting
@@ -35,7 +35,7 @@ getItemId <- function(team_name, folder_path, filename = ""){
 #' List files in a folder
 #'
 #' @param team_name name of team or drive
-#' @param folder_path replace back slashes with forward slashes `/`. Feel free to keep spaces if present.
+#' @param folder_path replace back slashes with forward slashes `/`
 #'
 #' @return `data.table` containing `File` (name of the file / subfolder) and `LastModified` date
 #'
@@ -65,3 +65,21 @@ listFiles <- function(team_name, folder_path){
 
 }
 
+#' Download Sharepoint Item
+#'
+#' @param team_name name of team or drive
+#' @param folder_name replace back slashes with forward slashes `/`
+#' @param file_name include extension, leave alone if you're looking for item id of a folder only
+#'
+#' @return full file path where the file is downloaded.
+#' After use, consider deleting this file by `file.remove()` to keep temp directory clean.
+#'
+#' @export
+downloadFileFromSharepoint <- function(team_name, folder_name, file_name){
+  temp_file <- sprintf("%s/%s", dirname(tempdir()), file_name);
+  drive_id <- getDriveId(team_name); file_id <- getItemId(team_name, folder_path = folder_name, filename = file_name)
+  download_link <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s", drive_id, file_id),
+                                           httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$`@microsoft.graph.downloadUrl`
+  download.file(download_link, temp_file, mode = "wb");
+  return(temp_file)
+}
