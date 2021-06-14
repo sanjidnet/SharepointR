@@ -22,6 +22,7 @@ getItemId <- function(team_name, folder_path, filename = ""){
 
   driveid <- getDriveId(team_name)
   folder_path <- gsub("\\s", "%20", folder_path)
+  filename <- gsub("\\s", "%20", filename)
 
   item_id <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s%s", driveid, folder_path, filename),
     httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$id
@@ -69,9 +70,9 @@ listFiles <- function(team_name, folder_path){
 #'
 #' @param team_name name of team or drive
 #' @param folder_name replace back slashes with forward slashes `/`
-#' @param file_name include extension, leave alone if you're looking for item id of a folder only
+#' @param file_name include extension
 #'
-#' @return full file path where the file is downloaded.
+#' @return returns full/file/path/to where the file is downloaded.
 #' After use, consider deleting this file by `file.remove()` to keep temp directory clean.
 #'
 #' @export

@@ -11,10 +11,10 @@ downloadFileFromSharepoint(team_name, folder_name, file_name)
 
 \item{folder_name}{replace back slashes with forward slashes `/`}
 
-\item{file_name}{include extension, leave alone if you're looking for item id of a folder only}
+\item{file_name}{include extension}
 }
 \value{
-full file path where the file is downloaded.
+returns full/file/path/to where the file is downloaded.
 After use, consider deleting this file by `file.remove()` to keep temp directory clean.
 }
 \description{

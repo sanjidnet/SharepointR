@@ -70,7 +70,7 @@ deleteSharepointItem <- function(team_name, folder_name, file_name){
 }
 
 processTransferParameters <- function(read_team_name, read_folder, read_file, write_team_name, write_folder, write_file){
-  read_folder <- gsub("\\s", "%20", read_folder); write_folder <- gsub("\\s", "%20", write_folder); read_file <- gsub("\\s", "%20", read_file)
+  read_folder <- gsub("\\s", "%20", read_folder); write_folder <- gsub("\\s", "%20", write_folder); read_file <- gsub("\\s", "%20", read_file); write_file <- gsub("\\s", "%20", write_file)
   read_drive_id <- getDriveId(read_team_name); write_drive_id <- getDriveId(write_team_name);
 
   read_file_id <- httr::content(httr::GET(sprintf("https://graph.microsoft.com/v1.0/drives/%s/root:/General/%s%s", read_drive_id, read_folder, read_file), httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"))))$id
