@@ -60,6 +60,7 @@ listFiles <- function(team_name, folder_path){
     #Sys.sleep(1)
   }
   data.table::setnames(file_repo, c("FILE_ID", "LastModified", "File")); file_repo[, FILE_ID := NULL]
+  file_repo[, File := as.character(File)]
   file_repo[, LastModified := as.character(LastModified)]; file_repo[, LastModified := as.POSIXct(LastModified, format = "%Y-%m-%dT%H:%M%OS", tz = "UTC")]
   attributes(file_repo$LastModified)$tzone <- "Pacific/Auckland"
   return(file_repo)
