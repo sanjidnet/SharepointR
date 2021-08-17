@@ -17,6 +17,7 @@
     if(nchar(access_token)) message("Token successfully generated!")
     Sys.setenv(SHAREPOINT_TOKEN = sprintf("Bearer %s", access_token))
   }, error = function(e){
+    warning("Please ensure `.Rprofile` and `.Renviron` files are available at: ", Sys.getenv("R_USER"))
     warning("Could not generate access token. Please follow instructions in README file.")
       }
     )
