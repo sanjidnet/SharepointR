@@ -4,8 +4,6 @@
   clientid <- Sys.getenv("SHAREPOINT_CLIENTID")
   clientsecret <- Sys.getenv("SHAREPOINT_CLIENTSECRET")
   realm <- Sys.getenv("SHAREPOINT_REALM") # also directory_id
-  #principal <- "00000003-0000-0ff1-ce00-000000000000"
-  #target <- "opdepot.sharepoint.com"
 
   if(!nchar(clientid)) warning("Client ID not found! Please follow instructions in README file.")
 
