@@ -23,7 +23,6 @@ int_to_excel_column <- function(input){
 #' @return
 #' @export
 #'
-#' @examples
 writeExcelToSharepoint <- function(read_team_name, read_folder, read_file, write_team_name, write_folder, write_file, dta, preserve_class = TRUE){
   # No point proceeding if there is no data to write
   if(!dim(dta)[1]){
@@ -70,6 +69,21 @@ writeExcelToSharepoint <- function(read_team_name, read_folder, read_file, write
   return(write_folder_url)
 }
 
+#' Write a single column into exisiting excel file in Sharepoint
+#'
+#' @param drive_id
+#' @param write_file_id
+#' @param sheetid
+#' @param session_id
+#' @param dta
+#' @param column_id
+#' @param column_name
+#' @param preserve_class
+#'
+#' @return
+#' @export
+#'
+#' @examples
 writeColumn <- function(drive_id, write_file_id, sheetid, session_id, dta, column_id, column_name, preserve_class){
   temp <- jsonlite::toJSON(list(values = as.list(c(column_name, t(dta)))), pretty = TRUE, na = "null")
   iterator <- ceiling(as.numeric(object.size(temp)) / 512 / 1024 / 4) # conservative iterator; always >= 1
@@ -115,8 +129,6 @@ writeColumn <- function(drive_id, write_file_id, sheetid, session_id, dta, colum
     end_at <- (t*entry_limit + entry_limit)
     writer <- dta[start_at : end_at, ]
 
-    #message("t: ", t, " -start_at: ", start_at, " -end_at: ", end_at)
-
     request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s%s:%s%s')",
                              drive_id, write_file_id, sheetid, int_to_excel_column(column_id), (start_at + 1), int_to_excel_column(column_id), (end_at + 1)),
                      httr::add_headers("Authorization" = Sys.getenv("SHAREPOINT_TOKEN"), "Content-Type" = "application/json", "Workbook-Session-Id" = session_id),
@@ -124,7 +136,6 @@ writeColumn <- function(drive_id, write_file_id, sheetid, session_id, dta, colum
     t <- t + 1
   }
 
-  # LOOP ENDS message("t: ", t, " -remainder: ", remainder, " -rows: ", dim(dta)[1])
   if(remainder == 0) return(request)
   # FIX REMAINDER SCRIPT
   request <- httr::PATCH(sprintf("https://graph.microsoft.com/v1.0/drives/%s/items/%s/workbook/worksheets/%s/range(address='%s%s:%s%s')",
