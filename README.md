@@ -14,13 +14,17 @@ and modify Microsoft Sharepoint items.
 Passwords, access tokens, API keys are not stored here. So, installation
 will require the following steps:
 
-1.  Create / modify `.Rprofile` file in location `Sys.getenv("R_USER")`
-    to ensure the following line exists in the file:
+1.  Open R Console / RStudio and find out R_USER folder by executing
+
+    `Sys.getenv("R_USER")`
+
+2.  Create / modify `.Rprofile` file in R_USER folder and
+    ensure the following line exists in the file:
 
     `readRenviron(paste0(Sys.getenv("R_USER"), "/.Renviron"))`
 
-2.  Create / modify `.Renviron` file in location `Sys.getenv("R_USER")`
-    to ensure the following line exists in the file:
+3.  Create / modify `.Renviron` file in R_USER folder and
+    ensure the following line exists in the file:
 
     `SHAREPOINT_CLIENTID` = &lt;&gt;
 
